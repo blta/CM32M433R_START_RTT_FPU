@@ -80,6 +80,7 @@ struct rt_hw_stack_frame
 #endif
     rt_ubase_t mstatus;    /*!<              - machine status register             */
 
+
 /* float register */
 #ifdef ARCH_RISCV_FPU
 	rv_floatreg_t f0;      /* f0  */
@@ -114,6 +115,8 @@ struct rt_hw_stack_frame
 	rv_floatreg_t f29;     /* f29 */
 	rv_floatreg_t f30;     /* f30 */
 	rv_floatreg_t f31;     /* f31 */
+    rt_ubase_t t0_back;         /*!< x5  - t0     - temporary register 0                */
+    rt_ubase_t t1_back;         /*!< x6  - t1     - temporary register 1                */
 #endif
 };
 
