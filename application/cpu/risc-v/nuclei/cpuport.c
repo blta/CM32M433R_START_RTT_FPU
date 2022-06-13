@@ -147,7 +147,7 @@ rt_uint8_t *rt_hw_stack_init(void       *tentry,
         if(i < 30)
             ((rt_ubase_t *)frame)[i] = 0xdeadbeef;
         else
-            ((rv_floatreg_t *)frame)[i] = 0x00;
+            ((rt_int32_t *)frame)[i] = 0x00;
     }
 
     frame->ra      = (rt_ubase_t)texit;
