@@ -52,29 +52,34 @@ float float_func(float r,float h)
 void thread1_entry(void *paramters)
 {
 	volatile float V = 0 , C= 0, r = 1.0, h=1;
-
-
+	volatile float a = 1 , b= 1, c = 1, d=1;
+	uint32_t res=0;
+	rt_thread_mdelay(1);
 
 	while(1)
 	{
-
-
 		V = float_func(r,h);
-		printf("C1: %f, V1= %f\n",C,V);
-		rt_thread_mdelay(1);
+		V = float_func(r+1,h);
+		V = V+a+b+c+d;
+		res = V*1000;
+        if( res != 54265)
+			printf("res: %d, V1= %f\n",res,V);
+        else
+        	printf("res: %d, V1= %f\n",res,V);
 	}
 }
 void thread2_entry(void *paramters)
 {
 	volatile float V = 0 , C= 0, r = 2.0, h=2, fac=2;
-
+	volatile float a = 2 , b= 2, c = 2, d=2;
 
 	while(1)
 	{
-
-//		C = 2*r*3.1415;
 		V = float_func(r,h);
-		printf("C2: %f, V2= %f\n",C,V);
+		V = V+a+b+c+d;
+	//	rt_mutex_take(mutex1, RT_WAITING_FOREVER);
+	//	printf("C2: %f, V2= %f\n",C,V);
+	//	rt_mutex_release(mutex1);
 	}
 }
 /** @addtogroup CM32M4XXR_StdPeriph_Examples
@@ -94,7 +99,7 @@ int main(void)
 
     /* Output a message on Hyperterminal using printf function */
     printf("CM32M4XXR RT Thread sample\r\n");
-
+    mutex1 = rt_mutex_create("mutex", RT_IPC_FLAG_PRIO);
 	thread1 = rt_thread_create("thread1",thread1_entry, NULL, 1024, 11, 1);
 	if(thread1 != NULL)
 	{
@@ -105,14 +110,14 @@ int main(void)
 		printf("\r\n create thread1 failed\r\n");
 	}
 
-	thread1 = rt_thread_create("thread1",thread2_entry, NULL, 1024, 12, 1);
-	if(thread1 != NULL)
+	thread2 = rt_thread_create("thread2",thread2_entry, NULL, 1024, 11, 1);
+	if(thread2 != NULL)
 	{
-		rt_thread_startup(thread1);
+		rt_thread_startup(thread2);
 	}
 	else
 	{
-		printf("\r\n create thread1 failed\r\n");
+		printf("\r\n create thread2 failed\r\n");
 	}
     while (1)
     {
