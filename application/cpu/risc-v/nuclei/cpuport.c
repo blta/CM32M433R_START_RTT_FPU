@@ -79,6 +79,42 @@ struct rt_hw_stack_frame
     rt_ubase_t t6;         /*!< x31 - t6     - temporary register 6                */
 #endif
     rt_ubase_t mstatus;    /*!<              - machine status register             */
+
+/* float register */
+#ifdef ARCH_RISCV_FPU
+	rv_floatreg_t f0;      /* f0  */
+	rv_floatreg_t f1;      /* f1  */
+	rv_floatreg_t f2;      /* f2  */
+	rv_floatreg_t f3;      /* f3  */
+	rv_floatreg_t f4;      /* f4  */
+	rv_floatreg_t f5;      /* f5  */
+	rv_floatreg_t f6;      /* f6  */
+	rv_floatreg_t f7;      /* f7  */
+	rv_floatreg_t f8;      /* f8  */
+	rv_floatreg_t f9;      /* f9  */
+	rv_floatreg_t f10;     /* f10 */
+	rv_floatreg_t f11;     /* f11 */
+	rv_floatreg_t f12;     /* f12 */
+	rv_floatreg_t f13;     /* f13 */
+	rv_floatreg_t f14;     /* f14 */
+	rv_floatreg_t f15;     /* f15 */
+	rv_floatreg_t f16;     /* f16 */
+	rv_floatreg_t f17;     /* f17 */
+	rv_floatreg_t f18;     /* f18 */
+	rv_floatreg_t f19;     /* f19 */
+	rv_floatreg_t f20;     /* f20 */
+	rv_floatreg_t f21;     /* f21 */
+	rv_floatreg_t f22;     /* f22 */
+	rv_floatreg_t f23;     /* f23 */
+	rv_floatreg_t f24;     /* f24 */
+	rv_floatreg_t f25;     /* f25 */
+	rv_floatreg_t f26;     /* f26 */
+	rv_floatreg_t f27;     /* f27 */
+	rv_floatreg_t f28;     /* f28 */
+	rv_floatreg_t f29;     /* f29 */
+	rv_floatreg_t f30;     /* f30 */
+	rv_floatreg_t f31;     /* f31 */
+#endif
 };
 
 /**
@@ -108,13 +144,15 @@ rt_uint8_t *rt_hw_stack_init(void       *tentry,
 
     for (i = 0; i < sizeof(struct rt_hw_stack_frame) / sizeof(rt_ubase_t); i++)
     {
-        ((rt_ubase_t *)frame)[i] = 0xdeadbeef;
+        if(i < 32)
+            ((rt_ubase_t *)frame)[i] = 0xdeadbeef;
+        else
+            ((rv_floatreg_t *)frame)[i] = 0x00;
     }
 
     frame->ra      = (rt_ubase_t)texit;
     frame->a0      = (rt_ubase_t)parameter;
     frame->epc     = (rt_ubase_t)tentry;
-
     frame->mstatus = RT_INITIAL_MSTATUS;
 
     return stk;
