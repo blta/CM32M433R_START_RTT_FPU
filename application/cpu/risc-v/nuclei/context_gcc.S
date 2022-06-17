@@ -129,7 +129,18 @@ rt_hw_context_switch_to:
 .global eclic_msip_handler
 eclic_msip_handler:
 #ifdef ARCH_RISCV_FPU
-	addi sp, sp, -32*FREGBYTES
+    /* store t0 and t1 to stack firstly */
+    addi    sp, sp, -34 * FREGBYTES
+    STORE x5,   32 * REGBYTES(sp)
+    STORE x6,   33 * REGBYTES(sp)
+
+    /* if FS region of mstatus is dirty, save the FPU registers */
+    csrr  t0,  mstatus
+    srli  t0, t0,  13
+    andi  t0, t0, 3
+
+    li  t1, 3
+    bne  t0, t1, 1f
 
     FSTORE  f0, 0 * FREGBYTES(sp)
     FSTORE  f1, 1 * FREGBYTES(sp)
@@ -163,8 +174,18 @@ eclic_msip_handler:
     FSTORE  f29, 29 * FREGBYTES(sp)
     FSTORE  f30, 30 * FREGBYTES(sp)
     FSTORE  f31, 31 * FREGBYTES(sp)
+    /* recover t0 and t1 */
+    LOAD x5,   32 * REGBYTES(sp)
+    LOAD x6,   33 * REGBYTES(sp)
+    j  2f
+
+1:  LOAD x5,   32 * REGBYTES(sp)
+    LOAD x6,   33 * REGBYTES(sp)
+    addi sp, sp, 34 * REGBYTES
 #endif
-    addi sp, sp, -RT_CONTEXT_SIZE
+
+
+2:  addi sp, sp, -RT_CONTEXT_SIZE
     STORE x1,  1  * REGBYTES(sp)    /* RA */
     STORE x5,  2  * REGBYTES(sp)
     STORE x6,  3  * REGBYTES(sp)
@@ -260,6 +281,18 @@ eclic_msip_handler:
      /* load float reg */
 #ifdef ARCH_RISCV_FPU
 
+//    STORE x5,   32 * REGBYTES(sp)
+//    STORE x6,   33 * REGBYTES(sp)
+
+    /* if FS region of mstatus is dirty, save the FPU registers */
+    csrr  t0,  mstatus
+    srli  t0, t0,  13
+    andi  t0, t0, 3
+
+    li  t1, 2
+    /* if FS region of mstatus is off and init, ignore the FPU registers */
+    blt  t0, t1, 3f
+
     FLOAD   f0, 0 * FREGBYTES(sp)
     FLOAD   f1, 1 * FREGBYTES(sp)
     FLOAD   f2, 2 * FREGBYTES(sp)
@@ -292,6 +325,13 @@ eclic_msip_handler:
     FLOAD   f29, 29 * FREGBYTES(sp)
     FLOAD   f30, 30 * FREGBYTES(sp)
     FLOAD   f31, 31 * FREGBYTES(sp)
-    addi    sp, sp, 32 * FREGBYTES
+    /* recover t0 and t1 */
+    LOAD  x5,   -27 * REGBYTES(sp)
+    LOAD  x6,   -26 * REGBYTES(sp)
+    addi    sp, sp, 34 * FREGBYTES
+    j 4f
+    /* recover t0 and t1 */
+3:  LOAD  x5,   -27 * REGBYTES(sp)
+    LOAD  x6,   -26 * REGBYTES(sp)
 #endif
-    mret
+4:  mret
