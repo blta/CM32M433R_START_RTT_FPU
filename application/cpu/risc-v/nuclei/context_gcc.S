@@ -86,43 +86,7 @@ rt_hw_context_switch_to:
 #endif
 
     addi sp, sp, RT_CONTEXT_SIZE
- /* load float reg */
-#ifdef ARCH_RISCV_FPU
 
-    FLOAD   f0, 0 * FREGBYTES(sp)
-    FLOAD   f1, 1 * FREGBYTES(sp)
-    FLOAD   f2, 2 * FREGBYTES(sp)
-    FLOAD   f3, 3 * FREGBYTES(sp)
-    FLOAD   f4, 4 * FREGBYTES(sp)
-    FLOAD   f5, 5 * FREGBYTES(sp)
-    FLOAD   f6, 6 * FREGBYTES(sp)
-    FLOAD   f7, 7 * FREGBYTES(sp)
-    FLOAD   f8, 8 * FREGBYTES(sp)
-    FLOAD   f9, 9 * FREGBYTES(sp)
-    FLOAD   f10, 10 * FREGBYTES(sp)
-    FLOAD   f11, 11 * FREGBYTES(sp)
-    FLOAD   f12, 12 * FREGBYTES(sp)
-    FLOAD   f13, 13 * FREGBYTES(sp)
-    FLOAD   f14, 14 * FREGBYTES(sp)
-    FLOAD   f15, 15 * FREGBYTES(sp)
-    FLOAD   f16, 16 * FREGBYTES(sp)
-    FLOAD   f17, 17 * FREGBYTES(sp)
-    FLOAD   f18, 18 * FREGBYTES(sp)
-    FLOAD   f19, 19 * FREGBYTES(sp)
-    FLOAD   f20, 20 * FREGBYTES(sp)
-    FLOAD   f21, 21 * FREGBYTES(sp)
-    FLOAD   f22, 22 * FREGBYTES(sp)
-    FLOAD   f23, 23 * FREGBYTES(sp)
-    FLOAD   f24, 24 * FREGBYTES(sp)
-    FLOAD   f25, 25 * FREGBYTES(sp)
-    FLOAD   f26, 26 * FREGBYTES(sp)
-    FLOAD   f27, 27 * FREGBYTES(sp)
-    FLOAD   f28, 28 * FREGBYTES(sp)
-    FLOAD   f29, 29 * FREGBYTES(sp)
-    FLOAD   f30, 30 * FREGBYTES(sp)
-    FLOAD   f31, 31 * FREGBYTES(sp)
-    addi    sp, sp, 32 * FREGBYTES
-#endif
     mret
 
 .align 2
