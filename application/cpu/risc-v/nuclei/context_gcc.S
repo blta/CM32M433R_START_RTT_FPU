@@ -95,8 +95,8 @@ eclic_msip_handler:
 #ifdef ARCH_RISCV_FPU
     /* store t0 and t1 to stack firstly */
     addi    sp, sp, -34 * FREGBYTES
-    STORE x5,   32 * REGBYTES(sp)
-    STORE x6,   33 * REGBYTES(sp)
+    STORE t0,   32 * REGBYTES(sp)
+    STORE t1,   33 * REGBYTES(sp)
 
     /* if FS region of mstatus is dirty, save the FPU registers */
     csrr  t0,  mstatus
@@ -139,12 +139,12 @@ eclic_msip_handler:
     FSTORE  f30, 30 * FREGBYTES(sp)
     FSTORE  f31, 31 * FREGBYTES(sp)
     /* recover t0 and t1 */
-    LOAD x5,   32 * REGBYTES(sp)
-    LOAD x6,   33 * REGBYTES(sp)
+    LOAD t0,   32 * REGBYTES(sp)
+    LOAD t1,   33 * REGBYTES(sp)
     j  2f
 
-1:  LOAD x5,   32 * REGBYTES(sp)
-    LOAD x6,   33 * REGBYTES(sp)
+1:  LOAD t0,   32 * REGBYTES(sp)
+    LOAD t1,   33 * REGBYTES(sp)
     addi sp, sp, 34 * REGBYTES
 #endif
 
@@ -245,9 +245,6 @@ eclic_msip_handler:
      /* load float reg */
 #ifdef ARCH_RISCV_FPU
 
-//    STORE x5,   32 * REGBYTES(sp)
-//    STORE x6,   33 * REGBYTES(sp)
-
     /* if FS region of mstatus is dirty, save the FPU registers */
     csrr  t0,  mstatus
     srli  t0, t0,  13
@@ -290,12 +287,12 @@ eclic_msip_handler:
     FLOAD   f30, 30 * FREGBYTES(sp)
     FLOAD   f31, 31 * FREGBYTES(sp)
     /* recover t0 and t1 */
-    LOAD  x5,   -27 * REGBYTES(sp)
-    LOAD  x6,   -26 * REGBYTES(sp)
+    LOAD  t0,   -27 * REGBYTES(sp)
+    LOAD  t1,   -26 * REGBYTES(sp)
     addi    sp, sp, 34 * FREGBYTES
     j 4f
     /* recover t0 and t1 */
-3:  LOAD  x5,   -27 * REGBYTES(sp)
-    LOAD  x6,   -26 * REGBYTES(sp)
+3:  LOAD  t0,   -27 * REGBYTES(sp)
+    LOAD  t1,   -26 * REGBYTES(sp)
 #endif
 4:  mret
