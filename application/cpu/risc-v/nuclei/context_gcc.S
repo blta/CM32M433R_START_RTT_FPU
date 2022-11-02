@@ -98,14 +98,17 @@ eclic_msip_handler:
     STORE t0,   32 * REGBYTES(sp)
     STORE t1,   33 * REGBYTES(sp)
 
-    /* if FS region of mstatus is dirty, save the FPU registers */
+    /* Get mstatus[13:14]->FS region*/
     csrr  t0,  mstatus
     srli  t0, t0,  13
     andi  t0, t0, 3
 
-    li  t1, 3
-    bne  t0, t1, 1f
+    /* FS : 0->off, 1->init, 2->clean, 3->dirty */
+    li  t1, 2
+    /* if FS region of mstatus is off or init, ignore the FPU registers */
+    blt  t0, t1, 1f
 
+    /* if FS region of mstatus is clean or dirty, save the FPU registers */
     FSTORE  f0, 0 * FREGBYTES(sp)
     FSTORE  f1, 1 * FREGBYTES(sp)
     FSTORE  f2, 2 * FREGBYTES(sp)
@@ -242,18 +245,20 @@ eclic_msip_handler:
 #endif
 
     addi sp, sp, RT_CONTEXT_SIZE
-     /* load float reg */
+    /* load float reg */
 #ifdef ARCH_RISCV_FPU
 
-    /* if FS region of mstatus is dirty, save the FPU registers */
+    /* Get mstatus[13:14]->FS region*/
     csrr  t0,  mstatus
     srli  t0, t0,  13
     andi  t0, t0, 3
 
+    /* FS : 0->off, 1->init, 2->clean, 3->dirty */
     li  t1, 2
-    /* if FS region of mstatus is off and init, ignore the FPU registers */
+    /* if FS region of mstatus is off or init, ignore the FPU registers */
     blt  t0, t1, 3f
 
+    /* if FS region of mstatus is clean or dirty, restore the FPU registers */
     FLOAD   f0, 0 * FREGBYTES(sp)
     FLOAD   f1, 1 * FREGBYTES(sp)
     FLOAD   f2, 2 * FREGBYTES(sp)
